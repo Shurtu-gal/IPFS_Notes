@@ -25,27 +25,28 @@
 </head>
 
 <body>
-
     <div id="app" v-cloak>
-        <button class="options" style="margin-right: 4px;">share</button>
-
-        <button v-on:click="plainText = ''" class="options">clear</button>
-        <button v-on:click="showMarkdownRender = !showMarkdownRender" class="options">toggle rendering</button>
-        <a href="#" class="options">settings</a>
-        <a href="#" class="options" style="float: right;">about</a>
+        <button class="options" >Share</button>
+        <button @click="deleteData" class="options">Clear</button>
+        <button @click="encryptData" class="options">Encrypt</button>
+        <button @click="decryptData" class="options">Decrypt</button>
+        <a href="#" class="options">about</a>
         <hr>
         
         <div class="markdown-input-and-output">
             <textarea id="mdInput" v-model="plainText" :placeholder="guide" rows='18' style="border: none; outline: none;"></textarea>
-            <div id="mdOutput" v-html="renderedHTML" v-show="showMarkdownRender"></div>
+            <div id="mdOutput" v-html="renderedHTML"></div>
+            <p>{{ encData }}</p>
         </div>
-    </div>
+    
 
+    </div>
 </body>
 </html>
 
 <script src="https://unpkg.com/vue@3"></script>
 <script src="https://cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 
 <script>
 var md = new Remarkable()
@@ -57,10 +58,54 @@ const app = Vue.createApp({
             \nTry writing markdown here, and see it being rendered live below!
             \n\nThis text will disappear once you start typing.`,
 
-            showMarkdownRender: true,
+            plainText: "",
+            secret : "123#$%",
+            encData: " ",
+        };
+    },
 
-            plainText: ''
-        }
+    methods: {
+        encryptData() {
+            if (this.plainText.length) {
+                // hash the name with any algorithm
+                const data = CryptoJS.AES.encrypt(this.plaintext, this.secret).toString();
+
+                // store into localStorage
+                localStorage.setItem("secretData", data);
+
+                // display the encrypted data
+                this.getEncryptedData();
+            }
+        },
+
+        decryptData() {
+            // get data from localStorage
+            const secretData = localStorage.getItem("secretData");
+
+            // decrypt the data and convert to string
+            const decryptData = CryptoJS.AES.decrypt(
+                secretData,
+                this.secret
+            );//.toString(CryptoJS.enc.Utf8);
+
+            localStorage.setItem("dData", decryptData);
+
+            alert("Decrypted private data: " + decryptData);
+        },
+
+        deleteData() {
+            // remove data from localStorage
+            plaintext =  " "; 
+            localStorage.removeItem("secretData");
+
+            // update text
+            this.getEncryptedData();
+            },
+
+            getEncryptedData() {
+            // get the data from localStorage or send placeholder text
+        this.encData = localStorage.getItem("secretData") || "No value present";
+        },
     },
 
     computed: {
@@ -74,11 +119,9 @@ const app = Vue.createApp({
     mounted() {
         // code to run after initialization
     },
-
-    methods: {
-
-    }
 })
+
+
 
 app.mount('#app')
 </script>
