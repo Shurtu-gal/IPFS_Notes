@@ -7,7 +7,7 @@ A simple markdown notepad in which you can share your notes with others and view
 ## Todo:
 - [x] Markdown rendering
 - [x] Encrypt/Decrypt notes
-- [ ] LocalStorage management system for notes (delete, maybe tags too)
+- [ ] LocalStorage management system for notes (page yet to be implemented)
 - [ ] Share notes (encrypts them with a password and proceeds to upload)
 - [ ] Upload to ipfs
 - [ ] Notes view page. (loads notes from ipfs CIDs and passwords shared by your friends)
