@@ -14,7 +14,7 @@
             margin: 4px;
         }
 
-        #mdInput, #mdOutput {
+        #mdInput, #mdOutput, .options {
             font-family: 'Courier New', Courier, monospace;
         }
         #mdInput {
@@ -25,19 +25,20 @@
 </head>
 
 <body>
+
     <div id="app" v-cloak>
         <button class="options" >Share</button>
         <button v-on:click="plainText = ''" class="options">Clear</button>
-        <a href="#" class="options">about</a>
+        <a href="#" class="options">settings</a>
+        <a href="#" class="options" style="float: right;">about</a>
         <hr>
         
         <div class="markdown-input-and-output">
             <textarea id="mdInput" v-model="plainText" :placeholder="guide" rows='18' style="border: none; outline: none;"></textarea>
             <div id="mdOutput" v-html="renderedHTML"></div>
         </div>
-    
-
     </div>
+
 </body>
 </html>
 
