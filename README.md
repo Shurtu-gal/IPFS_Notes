@@ -6,5 +6,6 @@ A simple markdown notepad that stores your notes in an encrypted form on the ipf
 
 Todo:
 - [x] Markdown rendering
-- [ ] Encrypt notes
+- [x] Encrypt/Decrypt notes
+- [ ] LocalStorage management system for notes (delete, maybe tags too)
 - [ ] Upload to ipfs

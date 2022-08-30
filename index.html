@@ -26,10 +26,11 @@
 
 <body>
     <div id="app" v-cloak>
-        <button class="options" >Share</button>
-        <button @click="deleteData" class="options">Clear</button>
+        <button class="options">Share</button>
+
         <button @click="encryptData" class="options">Encrypt</button>
         <button @click="decryptData" class="options">Decrypt</button>
+
         <a href="#" class="options">about</a>
         <hr>
         
@@ -38,7 +39,6 @@
             <div id="mdOutput" v-html="renderedHTML"></div>
             <p>{{ encData }}</p>
         </div>
-    
 
     </div>
 </body>
@@ -58,53 +58,104 @@ const app = Vue.createApp({
             \nTry writing markdown here, and see it being rendered live below!
             \n\nThis text will disappear once you start typing.`,
 
+            showMarkdownRender: true,
+
+
             plainText: "",
-            secret : "123#$%",
-            encData: " ",
+            password: "123#$%",
+            encryptedObj: {},
         };
     },
 
     methods: {
         encryptData() {
             if (this.plainText.length) {
-                // hash the name with any algorithm
-                const data = CryptoJS.AES.encrypt(this.plaintext, this.secret).toString();
+                // // hash the name with any algorithm
+                // const data = CryptoJS.AES.encrypt(this.plaintext, this.secret).toString();
 
-                // store into localStorage
-                localStorage.setItem("secretData", data);
+                // // store into localStorage
+                // localStorage.setItem("secretData", data);
 
-                // display the encrypted data
-                this.getEncryptedData();
+                // // display the encrypted data
+                // this.getEncryptedData();
+
+                const salt = CryptoJS.lib.WordArray.random(16)
+                const iv = CryptoJS.lib.WordArray.random(16)
+
+                const key = CryptoJS.PBKDF2(this.password, salt, { keySize: 256/32, iterations: 10000, hasher: CryptoJS.algo.SHA256})
+
+                const encrypted = CryptoJS.AES.encrypt(this.plainText, key, {iv: iv}).ciphertext
+
+                const concatenned =  CryptoJS.lib.WordArray.create().concat(salt).concat(iv).concat(encrypted)
+
+                this.encryptedObj = {
+                    iv: iv.toString(CryptoJS.enc.Base64),
+                    salt: salt.toString(CryptoJS.enc.Base64),
+                    encrypted: encrypted.toString(CryptoJS.enc.Base64),
+                    concatenned: concatenned.toString(CryptoJS.enc.Base64)
+                }
+
+                console.log(this.encryptedObj)
             }
         },
 
         decryptData() {
-            // get data from localStorage
-            const secretData = localStorage.getItem("secretData");
+            // // get data from localStorage
+            // const secretData = localStorage.getItem("secretData");
 
-            // decrypt the data and convert to string
-            const decryptData = CryptoJS.AES.decrypt(
-                secretData,
-                this.secret
-            );//.toString(CryptoJS.enc.Utf8);
+            // // decrypt the data and convert to string
+            // const decryptData = CryptoJS.AES.decrypt(
+            //     secretData,
+            //     this.secret
+            // );//.toString(CryptoJS.enc.Utf8);
 
-            localStorage.setItem("dData", decryptData);
+            // localStorage.setItem("dData", decryptData);
 
-            alert("Decrypted private data: " + decryptData);
+            // alert("Decrypted private data: " + decryptData);
+
+            const encrypted =  CryptoJS.enc.Base64.parse(this.encryptedObj.concatenned);
+
+            const salt_len = iv_len = 16;
+
+            const salt = CryptoJS.lib.WordArray.create(
+                encrypted.words.slice(0, salt_len / 4 )
+            );
+            
+            const iv = CryptoJS.lib.WordArray.create(
+                encrypted.words.slice(0 + salt_len / 4, (salt_len+iv_len) / 4 )
+            );
+
+            const key = CryptoJS.PBKDF2(
+                this.password,
+                salt,
+                { keySize: 256/32, iterations: 10000, hasher: CryptoJS.algo.SHA256}
+            );
+
+            const decrypted = CryptoJS.AES.decrypt(
+                {
+                    ciphertext: CryptoJS.lib.WordArray.create(
+                        encrypted.words.slice((salt_len + iv_len) / 4)
+                    )
+                },
+                key,
+                {iv: iv}
+            );
+
+            console.log(decrypted.toString(CryptoJS.enc.Utf8));
         },
 
         deleteData() {
-            // remove data from localStorage
-            plaintext =  " "; 
-            localStorage.removeItem("secretData");
+            // // remove data from localStorage
+            // plaintext =  " "; 
+            // localStorage.removeItem("secretData");
 
-            // update text
-            this.getEncryptedData();
-            },
+            // // update text
+            // this.getEncryptedData();
+            // },
 
-            getEncryptedData() {
-            // get the data from localStorage or send placeholder text
-        this.encData = localStorage.getItem("secretData") || "No value present";
+            // getEncryptedData() {
+            // // get the data from localStorage or send placeholder text
+            // this.encData = localStorage.getItem("secretData") || "No value present";
         },
     },
 
