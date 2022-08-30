@@ -143,12 +143,11 @@ let app = Vue.createApp({
                     this.loadedFromStorageID = ""
                     
                     console.log("updated an item in Local Storage")
-                    console.log(temp)
                     
                 } else { // creating an entirely new notes object
 
                     var noteObj = {
-                        type: "note",
+                        type: "local",
                         created_on: new Date().toLocaleString(),
                         last_modified: new Date().toLocaleString(),
                         title: this.plainText.split('\n')[0],
@@ -158,7 +157,6 @@ let app = Vue.createApp({
                     localStorage.setItem(local_id, JSON.stringify(noteObj))
 
                     console.log("saved a new item to Local Storage")
-                    console.log(noteObj)
                 }
 
             } else {
