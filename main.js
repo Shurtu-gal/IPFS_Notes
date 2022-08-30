@@ -101,6 +101,15 @@ let app = Vue.createApp({
             // console.log(plaintextAgain)
         },
 
+        newNote() {
+            if (this.plainText.length !== 0) {
+                this.plainText = ""
+                this.loadedFromStorageID = ""
+
+                console.log("started new note")
+            }
+        },
+
         loadNote() {
             if ((this.plainText.length === 0) && (this.loadedFromStorageID.length === 0)) { // if markdown input empty and nothing loaded
                 const nid = prompt("enter id of note to load", '')
@@ -140,7 +149,6 @@ let app = Vue.createApp({
                     temp.content = this.plainText
 
                     localStorage.setItem(this.loadedFromStorageID, JSON.stringify(temp))
-                    this.loadedFromStorageID = ""
                     
                     console.log("updated an item in Local Storage")
                     
@@ -155,6 +163,8 @@ let app = Vue.createApp({
                     }
 
                     localStorage.setItem(local_id, JSON.stringify(noteObj))
+
+                    this.loadedFromStorageID = local_id
 
                     console.log("saved a new item to Local Storage")
                 }
@@ -182,3 +192,6 @@ let app = Vue.createApp({
 })
 
 app.mount('#app')
+
+// TODO:
+// - don't update if text in plainText matches the one in localstorage item
