@@ -80,6 +80,7 @@ const app = Vue.createApp({
     methods: {
         encryptData() {
             if (this.plainText.length !== 0) {
+                this.password = prompt("enter a password (16 chr random string by default)", CryptoJS.lib.WordArray.random(16))
                 // // hash the name with any algorithm
                 // const data = CryptoJS.AES.encrypt(this.plaintext, this.secret).toString();
 
@@ -113,6 +114,7 @@ const app = Vue.createApp({
         },
 
         decryptData() {
+            this.password = prompt("enter the password", "")
             // // get data from localStorage
             // const secretData = localStorage.getItem("secretData");
 
@@ -156,6 +158,8 @@ const app = Vue.createApp({
 
             this.decryptedObj.text = decrypted.toString(CryptoJS.enc.Utf8)
             console.log(this.decryptedObj.text)
+
+            this.password = '' // clearing password variable
         },
 
         deleteData() {
@@ -173,8 +177,6 @@ const app = Vue.createApp({
         },
     
         shareFlow() {
-            this.password = prompt("enter a password (16 chr random string by default)", CryptoJS.lib.WordArray.random(16))
-
             this.encryptData();
 
             // upload to ipfs
