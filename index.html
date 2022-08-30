@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPFS Pad</title>
+
+    <style>
+        [v-cloak] {display: none;}
+
+        .options {
+            margin: 4px;
+        }
+
+        #mdInput, #mdOutput {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #mdInput {
+            width: 100%
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <button class="options" >Share</button>
+        <button v-on:click="plainText = ''" class="options">Clear</button>
+        <a href="#" class="options">about</a>
+        <hr>
+        
+        <div class="markdown-input-and-output">
+            <textarea id="mdInput" v-model="plainText" :placeholder="guide" rows='18' style="border: none; outline: none;"></textarea>
+            <div id="mdOutput" v-html="renderedHTML"></div>
+        </div>
+    
+
+    </div>
+</body>
+</html>
+
+<script src="https://unpkg.com/vue@3"></script>
+<script src="https://cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"></script>
+
+<script>
+var md = new Remarkable()
+
+const app = Vue.createApp({
+    data() {
+        return {
+            guide: `Welcome to IPFS pad - a note taking and sharing application that uses the decentralised IPFS system to store your content.
+            \nTry writing markdown here, and see it being rendered live below!
+            \n\nThis text will disappear once you start typing.`,
+
+            plainText: ''
+        }
+    },
+
+    computed: {
+        renderedHTML() {
+            return md.render(this.plainText)
+        }
+    },
+
+    mounted() {
+        // code to run after initialization
+    }
+})
+
+app.mount('#app')
+</script>
