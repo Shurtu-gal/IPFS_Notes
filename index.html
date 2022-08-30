@@ -59,7 +59,7 @@ const app = Vue.createApp({
             \n\nThis text will disappear once you start typing.`,
 
             // "page" control variable. Not using vue routers to reduce complexity since there won't be many pages
-            showPage: "main", // can take values: main, share, settings
+            showPage: "main", // can take values: main, share, open, settings
             
             // show rules for individual components
             showMarkdownRender: true,
@@ -68,7 +68,7 @@ const app = Vue.createApp({
 
             // vars used by the encryption/decryption process
             plainText: "",
-            password: "123#$%",
+            password: "",
             encryptedObj: {},
 
             decryptedObj: {
@@ -106,6 +106,7 @@ const app = Vue.createApp({
                 }
 
                 console.log(this.encryptedObj)
+                this.password = '' // clearing the password variable
             } else {
                 alert("no text entered")
             }
@@ -172,9 +173,13 @@ const app = Vue.createApp({
         },
     
         shareFlow() {
+            this.password = prompt("enter a password (16 chr random string by default)", CryptoJS.lib.WordArray.random(16))
+
             this.encryptData();
 
-            this.decryptData();
+            // upload to ipfs
+
+            this.decryptData(); // just for testing purpose. this will be used in a separate page
         }
     },
 
