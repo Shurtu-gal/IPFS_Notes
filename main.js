@@ -1,3 +1,4 @@
+
 var md = new Remarkable()
 
 let app = Vue.createApp({
@@ -8,7 +9,7 @@ let app = Vue.createApp({
             \n\nThis text will disappear once you start typing.`,
 
             // "page" control variable. Not using vue routers to reduce complexity since there won't be many pages
-            showPage: "main", // can take values: main, share (optional), open, settings, manage
+            showPage: "main", // can take values: main [x], share [], open []
             
             // show rules for individual components
             showMarkdownRender: true,
@@ -17,6 +18,7 @@ let app = Vue.createApp({
 
             // vars used by the encryption/decryption process
             plainText: "",
+            loadedFromStorageID: "" // tracks ID of note loaded from storage
         };
     },
 
@@ -97,7 +99,73 @@ let app = Vue.createApp({
 
             let plaintextAgain = this.decryptData(ciphertext, ""); // just for testing purpose. this will be used in a separate page
             // console.log(plaintextAgain)
-        }
+        },
+
+        loadNote() {
+            if ((this.plainText.length === 0) && (this.loadedFromStorageID.length === 0)) { // if markdown input empty and nothing loaded
+                const nid = prompt("enter id of note to load", '')
+                this.loadedFromStorageID = nid
+
+                var temp = JSON.parse(localStorage.getItem(nid))
+
+                this.plainText = temp.content
+
+                console.log("loaded an item from local storage")
+
+            } else {
+                alert("please save your current work first")
+            }
+
+        },
+
+        saveNote() { // save the contents of this.plainText to local storage. update if content was loaded from storage
+            if (this.plainText.length !== 0) {
+                // appendToNotesStorage(this.plainText)
+                const today = new Date().toLocaleString() // current date and time
+                const local_id = CryptoJS.lib.WordArray.random(20).toString() // generating a random ID
+
+                // const shared = {
+                //     state: false, // change to true if shared to ipfs
+                //     cid: // ipfs cid if shared
+                //     password: // password to decrypt the contents retrieved from cid
+                // },
+                
+                if (this.loadedFromStorageID.length !== 0) { // if note was loaded from storage, just update last modified and content
+
+                    let temp = JSON.parse(localStorage.getItem(this.loadedFromStorageID))
+                    localStorage.removeItem(this.loadedFromStorageID)
+
+                    temp.last_modified = new Date().toLocaleString()
+                    temp.title = this.plainText.split('\n')[0]
+                    temp.content = this.plainText
+
+                    localStorage.setItem(this.loadedFromStorageID, JSON.stringify(temp))
+                    this.loadedFromStorageID = ""
+                    
+                    console.log("updated an item in Local Storage")
+                    console.log(temp)
+                    
+                } else { // creating an entirely new notes object
+
+                    var noteObj = {
+                        type: "note",
+                        created_on: new Date().toLocaleString(),
+                        last_modified: new Date().toLocaleString(),
+                        title: this.plainText.split('\n')[0],
+                        content: this.plainText
+                    }
+
+                    localStorage.setItem(local_id, JSON.stringify(noteObj))
+
+                    console.log("saved a new item to Local Storage")
+                    console.log(noteObj)
+                }
+
+            } else {
+                alert("nothing to save")
+            }
+        },
+
     },
 
     computed: {
@@ -110,6 +178,8 @@ let app = Vue.createApp({
 
     mounted() {
         // code to run after initialization
+        
+
     },
 })
 

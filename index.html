@@ -27,16 +27,21 @@
 <body>
     <div id="app" v-cloak>
         <button @click="shareFlow" class="options">share</button>
-        <button class="options" @click="showMarkdownRender = !showMarkdownRender">toggle rendering</button>
+        <button @click="saveNote" class="options">save</button>
+        <button @click="loadNote" class="options">load</button>
 
-        <a href="#" class="options">manage</a>
-        <a href="#" class="options">settings</a>
+        <button @click="showMarkdownRender = !showMarkdownRender" class="options">toggle rendering</button>
+
         <a href="https://github.com/s-m33r/vue-ipfs-test-project" target="_blank" class="options" style="float: right;">about</a>
         <hr>
         
         <div class="markdown-input-and-output" v-show="showPage == 'main'">
             <textarea id="mdInput" v-model="plainText" :placeholder="guide" rows='18' style="border: none; outline: none;"></textarea>
             <div id="mdOutput" v-html="renderedHTML" v-show="showMarkdownRender"></div>
+        </div>
+
+        <div class="load-notes-menu" v-show="showPage == 'open'">
+
         </div>
 
     </div>
