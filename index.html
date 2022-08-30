@@ -27,15 +27,17 @@
 <body>
 
     <div id="app" v-cloak>
-        <button class="options" >Share</button>
-        <button v-on:click="plainText = ''" class="options">Clear</button>
+        <button class="options" style="margin-right: 4px;">share</button>
+
+        <button v-on:click="plainText = ''" class="options">clear</button>
+        <button v-on:click="showMarkdownRender = !showMarkdownRender" class="options">toggle rendering</button>
         <a href="#" class="options">settings</a>
         <a href="#" class="options" style="float: right;">about</a>
         <hr>
         
         <div class="markdown-input-and-output">
             <textarea id="mdInput" v-model="plainText" :placeholder="guide" rows='18' style="border: none; outline: none;"></textarea>
-            <div id="mdOutput" v-html="renderedHTML"></div>
+            <div id="mdOutput" v-html="renderedHTML" v-show="showMarkdownRender"></div>
         </div>
     </div>
 
@@ -55,18 +57,26 @@ const app = Vue.createApp({
             \nTry writing markdown here, and see it being rendered live below!
             \n\nThis text will disappear once you start typing.`,
 
+            showMarkdownRender: true,
+
             plainText: ''
         }
     },
 
     computed: {
         renderedHTML() {
-            return md.render(this.plainText)
+            if (this.showMarkdownRender) {
+                return md.render(this.plainText)
+            }
         }
     },
 
     mounted() {
         // code to run after initialization
+    },
+
+    methods: {
+
     }
 })
 
