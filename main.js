@@ -8,7 +8,7 @@ let app = Vue.createApp({
             \n\nThis text will disappear once you start typing.`,
 
             // "page" control variable. Not using vue routers to reduce complexity since there won't be many pages
-            showPage: "main", // can take values: main, share, open, settings
+            showPage: "main", // can take values: main, share (optional), open, settings, manage
             
             // show rules for individual components
             showMarkdownRender: true,
@@ -17,67 +17,45 @@ let app = Vue.createApp({
 
             // vars used by the encryption/decryption process
             plainText: "",
-            password: "",
-            encryptedObj: {},
-
-            decryptedObj: {
-                text: ""
-            }
         };
     },
 
     methods: {
-        encryptData() {
-            if (this.plainText.length !== 0) {
-                this.password = prompt("enter a password (16 chr random string by default)", CryptoJS.lib.WordArray.random(16))
-                // // hash the name with any algorithm
-                // const data = CryptoJS.AES.encrypt(this.plaintext, this.secret).toString();
-
-                // // store into localStorage
-                // localStorage.setItem("secretData", data);
-
-                // // display the encrypted data
-                // this.getEncryptedData();
+        encryptData(plaintext, password) { // encrypts {plaintext} with a password it prompts for. returns string representation of encrypted data. Pass in {password} as empty string for prompt.
+            if (plaintext.length !== 0) {
+                if (password.length === 0) {
+                    const password = prompt("enter a password (16 chr random string by default)", CryptoJS.lib.WordArray.random(16))
+                }
 
                 const salt = CryptoJS.lib.WordArray.random(16)
                 const iv = CryptoJS.lib.WordArray.random(16)
 
-                const key = CryptoJS.PBKDF2(this.password, salt, { keySize: 256/32, iterations: 10000, hasher: CryptoJS.algo.SHA256})
+                const key = CryptoJS.PBKDF2(password, salt, { keySize: 256/32, iterations: 10000, hasher: CryptoJS.algo.SHA256})
 
-                const encrypted = CryptoJS.AES.encrypt(this.plainText, key, {iv: iv}).ciphertext
+                const encrypted = CryptoJS.AES.encrypt(plaintext, key, {iv: iv}).ciphertext
 
                 const concatenned =  CryptoJS.lib.WordArray.create().concat(salt).concat(iv).concat(encrypted)
 
-                this.encryptedObj = {
+                const encryptedObj = {
                     iv: iv.toString(CryptoJS.enc.Base64),
                     salt: salt.toString(CryptoJS.enc.Base64),
                     encrypted: encrypted.toString(CryptoJS.enc.Base64),
                     concatenned: concatenned.toString(CryptoJS.enc.Base64)
                 }
 
-                console.log(this.encryptedObj)
-                this.password = '' // clearing the password variable
+                return encryptedObj.concatenned
+
             } else {
                 alert("no text entered")
             }
         },
 
-        decryptData() {
-            this.password = prompt("enter the password", "")
-            // // get data from localStorage
-            // const secretData = localStorage.getItem("secretData");
+        decryptData(data, password) {
+            if (password.length === 0) {
+                const password = prompt("enter the password", "")
+            }
 
-            // // decrypt the data and convert to string
-            // const decryptData = CryptoJS.AES.decrypt(
-            //     secretData,
-            //     this.secret
-            // );//.toString(CryptoJS.enc.Utf8);
-
-            // localStorage.setItem("dData", decryptData);
-
-            // alert("Decrypted private data: " + decryptData);
-
-            const encrypted =  CryptoJS.enc.Base64.parse(this.encryptedObj.concatenned)
+            const encrypted =  CryptoJS.enc.Base64.parse( data )
 
             const salt_len = iv_len = 16
 
@@ -90,7 +68,7 @@ let app = Vue.createApp({
             );
 
             const key = CryptoJS.PBKDF2(
-                this.password,
+                password,
                 salt,
                 { keySize: 256/32, iterations: 10000, hasher: CryptoJS.algo.SHA256}
             );
@@ -105,21 +83,20 @@ let app = Vue.createApp({
                 {iv: iv}
             );
 
-            this.decryptedObj.text = decrypted.toString(CryptoJS.enc.Utf8)
-            console.log(this.decryptedObj.text)
-
-            this.password = '' // clearing password variable
+            return decrypted.toString(CryptoJS.enc.Utf8)
         },
 
         deleteData() {
         },
     
-        shareFlow() {
-            this.encryptData();
+        shareFlow() { // sequence executed for sharing a note
+            let ciphertext = this.encryptData(this.plainText, "");
+            //c onsole.log(ciphertext)
 
             // upload to ipfs
 
-            this.decryptData(); // just for testing purpose. this will be used in a separate page
+            let plaintextAgain = this.decryptData(ciphertext, ""); // just for testing purpose. this will be used in a separate page
+            // console.log(plaintextAgain)
         }
     },
 
