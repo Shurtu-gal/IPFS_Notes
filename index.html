@@ -26,17 +26,16 @@
 
 <body>
     <div id="app" v-cloak>
-        <button class="options">share</button>
-
+        <button @click="shareFlow" class="options">share</button>
         <button class="options" @click="showMarkdownRender = !showMarkdownRender">toggle rendering</button>
 
-        <button @click="encryptData" class="options">Encrypt</button>
-        <button @click="decryptData" class="options">Decrypt</button>
-
-        <a href="#" class="options">about</a>
+        <!-- <button @click="encryptData" class="options">Encrypt</button>
+        <button @click="decryptData" class="options">Decrypt</button> -->
+        <a href="#" class="options">manage saved notes</a>
+        <a href="https://github.com/s-m33r/vue-ipfs-test-project" target="_blank" class="options" style="float: right;">about</a>
         <hr>
         
-        <div class="markdown-input-and-output">
+        <div class="markdown-input-and-output" v-show="showPage == 'main'">
             <textarea id="mdInput" v-model="plainText" :placeholder="guide" rows='18' style="border: none; outline: none;"></textarea>
             <div id="mdOutput" v-html="renderedHTML" v-show="showMarkdownRender"></div>
         </div>
@@ -60,10 +59,12 @@ const app = Vue.createApp({
             \n\nThis text will disappear once you start typing.`,
 
             // "page" control variable. Not using vue routers to reduce complexity since there won't be many pages
-            pageNum: 0,
+            showPage: "main", // can take values: main, share, settings
             
             // show rules for individual components
             showMarkdownRender: true,
+
+            display_md_section: (this.showPage === 0) && showMarkdownRender,
 
             // vars used by the encryption/decryption process
             plainText: "",
@@ -169,11 +170,17 @@ const app = Vue.createApp({
             // // get the data from localStorage or send placeholder text
             // this.encData = localStorage.getItem("secretData") || "No value present";
         },
+    
+        shareFlow() {
+            this.encryptData();
+
+            this.decryptData();
+        }
     },
 
     computed: {
         renderedHTML() {
-            if (this.showMarkdownRender && (this.pageNum === 0)) {
+            if (this.showMarkdownRender && (this.showPage === "main")) {
                 return md.render(this.plainText)
             }
         }
