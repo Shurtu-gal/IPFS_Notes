@@ -207,6 +207,3 @@ let app = Vue.createApp({
 })
 
 app.mount('#app')
-
-// TODO:
-// - don't update if text in plainText matches the one in localstorage item
