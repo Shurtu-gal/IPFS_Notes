@@ -103,6 +103,10 @@ let app = Vue.createApp({
 
         newNote() {
             if (this.plainText.length !== 0) {
+                const cmd = prompt("Would you like to save your current note before proceeding? (y/n)", "")
+                if(cmd == 'y'){
+                    this.saveNote();
+                }
                 this.plainText = ""
                 this.loadedFromStorageID = ""
 
