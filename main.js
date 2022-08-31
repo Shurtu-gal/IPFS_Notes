@@ -1,6 +1,23 @@
 
 var md = new Remarkable()
 
+async function addToIpfs(myString) {
+    const ipfs = await window.IpfsCore.create()
+
+    const { cid } = await ipfs.add(myString)
+    console.info(cid)
+
+    if (mode === "get") {}
+    
+}
+
+async function getFromIpfs(cid) {
+    const ipfs = await window.IpfsCore.create()
+
+    const output = await ipfs.cat(cid)
+    console.log(output)
+}
+
 let app = Vue.createApp({
     data() {
         return {
@@ -93,20 +110,17 @@ let app = Vue.createApp({
 
         viewNote() {
             cid = prompt("enter ipfs CID of item to fetch", "")
-
-            const data = JSON.stringify(fetch("https://ipfs.io/ipfs/"+cid))
-
-            console.log(data)
+            
+            getFromIpfs(cid)
         },
     
         shareNote() { // sequence executed for sharing a note
-            let ciphertext = this.encryptData(this.plainText, "");
-            //c onsole.log(ciphertext)
+            //let ciphertext = this.encryptData(this.plainText, "");
 
             // upload to ipfs
+            addToIpfs(this.plainText)
 
-            let plaintextAgain = this.decryptData(ciphertext, ""); // just for testing purpose. this will be used in a separate page
-            // console.log(plaintextAgain)
+            //let plaintextAgain = this.decryptData(ciphertext, ""); // just for testing purpose. this will be used in a separate page
         },
 
         newNote() {
