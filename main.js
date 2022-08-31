@@ -126,7 +126,8 @@ let app = Vue.createApp({
                 console.log("loaded an item from local storage")
 
             } else {
-                alert("please save your current work first")
+                this.newNote()
+                this.loadNote()
             }
 
         },
