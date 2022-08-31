@@ -103,14 +103,18 @@ let app = Vue.createApp({
 
         newNote() {
             if (this.plainText.length !== 0) {
-                const cmd = prompt("Would you like to save your current note before proceeding? (y/n)", "")
-                if(cmd == 'y'){
+                const cmd = confirm("Save your current note before proceeding? (y/n)") // a more direct way of asking
+                if(cmd){
                     this.saveNote();
                 }
+
                 this.plainText = ""
                 this.loadedFromStorageID = ""
 
                 console.log("started new note")
+                
+            } else if (this.loadedFromStorageID.length === 0) { // if the pad is empty, also check if its not something we are editing from local storage
+                this.plainText = ""
             }
         },
 
