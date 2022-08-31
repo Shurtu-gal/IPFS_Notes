@@ -1,22 +1,33 @@
 
 var md = new Remarkable()
 
+async function getFromIpfs(cid) {
+    const ipfs = await window.IpfsCore.create()
+
+    // const content = await ipfs.cat(cid)
+    const stream = ipfs.cat(cid)
+    const decoder = new TextDecoder()
+    let data = ''
+
+    for await (const chunk of stream) {
+        // chunks of data are returned as a Uint8Array, convert it back to a string
+        data += decoder.decode(chunk, { stream: true })
+    }
+
+    // TODO: decrypt data by assepting a password and replace plainText with that
+
+    console.log(data)
+}
+
 async function addToIpfs(myString) {
     const ipfs = await window.IpfsCore.create()
 
     const cid = await ipfs.add(myString)
 
+    window.open("https://ipfs.io/ipfs/"+cid.path, '_blank');
+
     console.log("cid:", cid.path)
 }
-
-async function getFromIpfs(cid) {
-    const ipfs = await window.IpfsCore.create()
-
-    const content = await ipfs.cat(cid)
-
-    console.log(content)
-}
-
 
 let app = Vue.createApp({
     data() {
@@ -108,12 +119,8 @@ let app = Vue.createApp({
         deleteData() {
         },
 
-        viewNote() {         
-            const cid = prompt("enter ipfs CID", "")
-            
-            var data = JSON.parse(fetch('http://ipfs.io/ipfs/'+cid))
-
-            console.log(data)
+        viewNote() {
+            getFromIpfs(prompt("Enter ipfs content ID"))
         },
     
         shareNote() { // sequence executed for sharing a note
@@ -230,7 +237,22 @@ let app = Vue.createApp({
             if (this.showMarkdownRender && (this.showPage === "main")) {
                 return md.render(this.plainText)
             }
-        }
+        },
+
+        // decryptFetchedFromIPFS() {
+        //     if (loadedFromIPFS.length !== 0) {
+        //         console.log("decrypting fetched data")
+
+        //         this.plainText = ""
+        //         this.loadedFromStorageID = ""
+
+        //         decryptionKey = prompt("enter password to decrypt")
+        //         this.plainText = this.decryptData(loadedFromIPFS, decryptionKey)
+
+        //         loadedFromIPFS = ""
+        //     }
+        // }
+    
     },
 
     mounted() {
