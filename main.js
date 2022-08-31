@@ -112,7 +112,7 @@ let app = Vue.createApp({
                 this.loadedFromStorageID = ""
 
                 console.log("started new note")
-                
+
             } else if (this.loadedFromStorageID.length === 0) { // if the pad is empty, also check if its not something we are editing from local storage
                 this.plainText = ""
             }
@@ -177,6 +177,12 @@ let app = Vue.createApp({
 
                     console.log("saved a new item to Local Storage")
                 }
+
+            } else if ((this.plainText.length === 0) && (this.loadedFromStorageID.length !== 0)) {
+                localStorage.removeItem(this.loadedFromStorageID)
+                this.loadedFromStorageID = ""
+
+                console.log("deleted an item from Local Storage")
 
             } else {
                 alert("nothing to save")
