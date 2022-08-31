@@ -4,19 +4,19 @@ var md = new Remarkable()
 async function addToIpfs(myString) {
     const ipfs = await window.IpfsCore.create()
 
-    const { cid } = await ipfs.add(myString)
-    console.info(cid)
+    const cid = await ipfs.add(myString)
 
-    if (mode === "get") {}
-    
+    console.log("cid:", cid.path)
 }
 
 async function getFromIpfs(cid) {
     const ipfs = await window.IpfsCore.create()
 
-    const output = await ipfs.cat(cid)
-    console.log(output)
+    const content = await ipfs.cat(cid)
+
+    console.log(content)
 }
+
 
 let app = Vue.createApp({
     data() {
@@ -40,10 +40,10 @@ let app = Vue.createApp({
     },
 
     methods: {
-        encryptData(plaintext, password) { // encrypts {plaintext} with a password it prompts for. returns string representation of encrypted data. Pass in {password} as empty string for prompt.
+        encryptData(plaintext, password) { // encrypts {plaintext} with a password it prompts for. returns array with string representation of encrypted data and password string. Pass in {password} as empty string for prompt.
             if (plaintext.length !== 0) {
                 if (password.length === 0) {
-                    const password = prompt("enter a password (16 chr random string by default)", CryptoJS.lib.WordArray.random(16))
+                    password = prompt("enter a password (16 chr random string by default)", CryptoJS.lib.WordArray.random(16))
                 }
 
                 const salt = CryptoJS.lib.WordArray.random(16)
@@ -62,7 +62,7 @@ let app = Vue.createApp({
                     concatenned: concatenned.toString(CryptoJS.enc.Base64)
                 }
 
-                return encryptedObj.concatenned
+                return [encryptedObj.concatenned, password]
 
             } else {
                 alert("no text entered")
@@ -108,19 +108,31 @@ let app = Vue.createApp({
         deleteData() {
         },
 
-        viewNote() {
-            cid = prompt("enter ipfs CID of item to fetch", "")
+        viewNote() {         
+            const cid = prompt("enter ipfs CID", "")
             
-            getFromIpfs(cid)
+            var data = JSON.parse(fetch('http://ipfs.io/ipfs/'+cid))
+
+            console.log(data)
         },
     
         shareNote() { // sequence executed for sharing a note
-            //let ciphertext = this.encryptData(this.plainText, "");
+            var encryptedData = this.encryptData(this.plainText, "")
+
+            console.log(encryptedData)
+
+            const encrypted = encryptedData[0]
+            const randomPass = encryptedData[1]
+
+            console.log("key:", randomPass)
 
             // upload to ipfs
-            addToIpfs(this.plainText)
+            addToIpfs(encrypted)
 
-            //let plaintextAgain = this.decryptData(ciphertext, ""); // just for testing purpose. this will be used in a separate page
+            // replace this.plainText
+            this.loadedFromStorageID = ""
+            this.plainText
+            
         },
 
         newNote() {
