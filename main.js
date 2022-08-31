@@ -90,8 +90,16 @@ let app = Vue.createApp({
 
         deleteData() {
         },
+
+        viewNote() {
+            cid = prompt("enter ipfs CID of item to fetch", "")
+
+            const data = JSON.stringify(fetch("https://ipfs.io/ipfs/"+cid))
+
+            console.log(data)
+        },
     
-        shareFlow() { // sequence executed for sharing a note
+        shareNote() { // sequence executed for sharing a note
             let ciphertext = this.encryptData(this.plainText, "");
             //c onsole.log(ciphertext)
 
